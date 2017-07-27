@@ -62,6 +62,24 @@
   %set_varoutput(SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN));
 }
 
+%typemap(directorout,noblock=1) CONST TYPE (void *argp, int res = 0) {
+  int newmem = 0;
+  res = SWIG_ConvertPtrAndOwn($input, &argp, $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), %convertptr_flags, &newmem);
+  if (!SWIG_IsOK(res)) {
+    %dirout_fail(res, "$type");
+  }
+  if (!argp) {
+    %dirout_nullref("$type");
+  } else {
+    $result = *(%reinterpret_cast(argp, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *)->get());
+    if (newmem & SWIG_CAST_NEW_MEMORY) delete %reinterpret_cast(argp, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *);
+  }
+}
+%typemap(directorin,noblock=1) CONST TYPE {
+  SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartresult = new SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE >(new $1_ltype(($1_ltype &)$1));
+  $input = SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN | %newpointer_flags);
+}
+
 // plain pointer
 // Note: $disown not implemented by default as it will lead to a memory leak of the shared_ptr instance
 %typemap(in) CONST TYPE * (void  *argp = 0, int res = 0, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > tempshared, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartarg = 0) {
@@ -215,6 +233,26 @@
   $input = $1 ? SWIG_NewPointerObj(%as_voidptr(&$1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), 0) : Py_None;
 }
 
+%typemap(directorin,noblock=1) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > {
+  if ($1) {
+    SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartresult = new SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE >($1);
+    $input = SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN | %newpointer_flags);
+  } else {
+    $input = SWIG_Py_Void();
+  }
+}
+%typemap(directorout,noblock=1) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > (void * swig_argp, int swig_res = 0) {
+  if ($input==Py_None) {
+    $result = $ltype();
+  } else {
+    swig_res = SWIG_ConvertPtr($input, &swig_argp, $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *), %convertptr_flags);
+    if (!SWIG_IsOK(swig_res)) {
+      %dirout_fail(swig_res,"$type");
+    }
+    $result = *(%reinterpret_cast(swig_argp, $&ltype));
+  }
+}
+
 // shared_ptr by reference
 %typemap(in) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > & (void *argp, int res = 0, $*1_ltype tempshared) {
   int newmem = 0;
@@ -236,6 +274,14 @@
 }
 %typemap(directorin) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > & {
   $input = $1 ? SWIG_NewPointerObj(%as_voidptr(&$1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), 0) : Py_None;
+}
+
+%typemap(directorin,noblock=1) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > & {
+  if ($1) {
+    $input = SWIG_NewPointerObj(%as_voidptr(&$1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), %newpointer_flags);
+  } else {
+    $input = SWIG_Py_Void();
+  }
 }
 
 %typemap(varin) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > & %{
@@ -269,6 +315,14 @@
   $input = ($1 && *$1) ? SWIG_NewPointerObj(%as_voidptr($1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), 0) : Py_None;
 }
 
+%typemap(directorin,noblock=1) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *const& {
+  if ($1 && *$1) {
+    $input = SWIG_NewPointerObj(%as_voidptr($1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), %newpointer_flags);
+  } else {
+    $input = SWIG_Py_Void();
+  }
+}
+
 %typemap(varin) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > * %{
 #error "varin typemap not implemented"
 %}
@@ -294,6 +348,14 @@
 }
 %typemap(directorin) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *& {
   $input = ($1 && *$1) ? SWIG_NewPointerObj(%as_voidptr($1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), 0) : Py_None;
+}
+
+%typemap(directorin,noblock=1) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *&, SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *const& {
+  if ($1 && *$1) {
+    $input = SWIG_NewPointerObj(%as_voidptr($1), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), %newpointer_flags);
+  } else {
+    $input = SWIG_Py_Void();
+  }
 }
 
 %typemap(varin) SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *& %{
