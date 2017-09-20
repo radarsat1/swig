@@ -126,8 +126,9 @@
   %set_varoutput(SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN));
 }
 
-%typemap(directorin,noblock=1) CONST TYPE * %{
-#error "directorin typemap for plain pointer not implemented"
+%typemap(directorin,noblock=1, fragment="SWIG_null_deleter_python") CONST TYPE * %{
+  SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartresult = $1 ? new SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE >($1 SWIG_NO_NULL_DELETER_0) : 0;
+  $input = SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN | %newpointer_flags);
 %}
 %typemap(directorout,noblock=1) CONST TYPE * %{
 #error "directorout typemap for plain pointer not implemented"
@@ -178,8 +179,9 @@
   %set_varoutput(SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN));
 }
 
-%typemap(directorin,noblock=1) CONST TYPE & %{
-#error "directorin typemap for plain reference not implemented"
+%typemap(directorin,noblock=1, fragment="SWIG_null_deleter_python") CONST TYPE & %{
+  SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartresult = new SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE >(&$1 SWIG_NO_NULL_DELETER_0);
+  $input = SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN | %newpointer_flags);
 %}
 %typemap(directorout,noblock=1) CONST TYPE & %{
 #error "directorout typemap for plain reference not implemented"
@@ -214,8 +216,9 @@
 #error "varout typemap not implemented"
 %}
 
-%typemap(directorin,noblock=1) TYPE *CONST& %{
-#error "directorin typemap for plain pointer by reference not implemented"
+%typemap(directorin,noblock=1, fragment="SWIG_null_deleter_python") TYPE *CONST& %{
+  SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE > *smartresult = $1 ? new SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< CONST TYPE >($1 SWIG_NO_NULL_DELETER_0) : 0;
+  $input = SWIG_NewPointerObj(%as_voidptr(smartresult), $descriptor(SWIG_SHARED_PTR_QNAMESPACE::shared_ptr< TYPE > *), SWIG_POINTER_OWN | %newpointer_flags);
 %}
 %typemap(directorout,noblock=1) TYPE *CONST& %{
 #error "directorout typemap for plain pointer by reference not implemented"
