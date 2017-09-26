@@ -280,7 +280,7 @@ fi
 AC_MSG_RESULT($RPATH)
 
 # LINKFORSHARED are the flags passed to the $(CC) command that links
-# the a few executables -- this is only needed for a few systems
+# a few executables -- this is only needed for a few systems
 
 AC_MSG_CHECKING(LINKFORSHARED)
 if test -z "$LINKFORSHARED"
@@ -900,6 +900,18 @@ if test -n "$PYINCLUDE" || test -n "$PY3INCLUDE" ; then
     AC_MSG_CHECKING(pep8 version)
     pep8_version=`$PEP8 --version 2>/dev/null`
     AC_MSG_RESULT($pep8_version)
+  fi
+fi
+
+AC_ARG_WITH(2to3, AS_HELP_STRING([--with-2to3=path], [Set location of Python 2to3 tool]), [PY2TO3BIN="$withval"], [PY2TO3BIN="yes"])
+if test -n "$PYTHON3"; then
+  if test "x$PY2TO3BIN" = xyes; then
+    AC_CHECK_PROGS(PY2TO3, 2to3)
+  else
+    PY2TO3="$PY2TO3BIN"
+  fi
+  if test -z "$PY2TO3"; then
+    PYTHON3=
   fi
 fi
 
